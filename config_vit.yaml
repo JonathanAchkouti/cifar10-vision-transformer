@@ -1,0 +1,30 @@
+run_name: 'vit_b16_finetune'
+
+model:
+  name: 'vit_base_patch16_224.augreg2_in21k_ft_in1k'
+  pretrained: true
+
+data:
+  val_split: 0.1
+  augment: true
+  cutout: false      # 3 epochs is far too short to overfit; skip it
+  num_workers: 2
+  root: 'data/cifar10'
+
+hyperparameters:
+  epochs: 3
+  batch_size: 64     # 224x224 inputs are 49x more pixels than 32x32
+  optimizer: 'adamw'
+  max_lr: 0.0001     # 4000x smaller than the from-scratch run
+  momentum: 0.9      # unused by AdamW, kept so one config schema serves both
+  weight_decay: 0.01
+  label_smoothing: 0.1
+  pct_start: 0.1     # short warmup; the weights are already good
+  seed: 42
+
+eval:
+  tta: true
+
+paths:
+  model_path: 'weights/vit_b16.pth'
+  results_path: 'results.csv'
